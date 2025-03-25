@@ -545,3 +545,9 @@ html {
     transition-duration: 600ms !important;
   }
 }
+
+@media (max-width: 992px) {
+  .hero-text {
+    top: 135px;
+  }
+}
