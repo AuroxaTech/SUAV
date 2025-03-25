@@ -377,13 +377,13 @@ body {
 
 .footer {
   background-color: #7a0034;
-  height: 45rem;
+  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 9rem;
-  padding-top: 10rem;
+  gap: 4rem;
+  padding: 6rem 0;
 }
 
 .dynamic-content {
