@@ -56,6 +56,22 @@ Medium: 11px
 2 / 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 80 / 96 / 128
 */
 
+@font-face {
+  font-family: 'AbarHigh';
+  src: url('./font/AbarHigh/AbarHigh-Black.ttf') format('truetype');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'AbarHigh';
+  src: url('./font/AbarHigh/AbarHigh-Bold.ttf') format('truetype');
+  font-weight: 500;
+}
+
+body {
+  font-family: 'AbarHigh', sans-serif;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -66,7 +82,7 @@ html {
   /* font-size: 10px; */
   /* 10px / 16px = 0.625 = 62.5% */
   /* Percentage of user's browser font-size setting */
-  font-family: "AbarHigh";
+  /* font-family: "AbarHigh"; */
   font-size: 62.5%;
 }
 
@@ -94,7 +110,7 @@ body {
 
 .logo {
   /* background-color: aliceblue; */
-  max-width: 88rem;
+  max-width: 80%;
   background-color: #7a0034;
   padding: 1.5rem 0;
   border-radius: 1.2rem;
@@ -150,7 +166,7 @@ body {
   position: absolute;
   top: 0;
   width: 100%;
-  max-width: 100rem;
+  max-width: 90%;
   height: 100%;
   display: flex;
   justify-content: space-between;
@@ -300,7 +316,7 @@ body {
 
 .company-img {
   background-image: url("img/Event.png");
-  background-size: 100% 100%;
+  background-size: cover;
   border-radius: 1.2rem;
 }
 
@@ -435,7 +451,7 @@ body {
   justify-content: center;
 }
 
-/* Loader Animation */
+/* Loader Animation with Video */
 .loader-container {
   position: fixed;
   top: 0;
@@ -452,73 +468,17 @@ body {
 
 .loader {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-.loader-logo {
-  width: 20rem;
-  animation: pulse 2s infinite alternate, rotate 4s infinite;
-  transform-origin: center;
-}
-
-.loader-bar {
-  width: 20rem;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #7a0034, transparent);
-  margin-top: 2rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.loader-bar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, #fff, transparent);
-  animation: loading 1.5s infinite;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(0.95);
-    filter: brightness(0.9);
-  }
-  100% {
-    transform: scale(1.05);
-    filter: brightness(1.1);
-  }
-}
-
-@keyframes rotate {
-  0% {
-    transform: rotate(0deg) scale(1);
-  }
-  25% {
-    transform: rotate(5deg) scale(1.05);
-  }
-  50% {
-    transform: rotate(0deg) scale(1);
-  }
-  75% {
-    transform: rotate(-5deg) scale(1.05);
-  }
-  100% {
-    transform: rotate(0deg) scale(1);
-  }
-}
-
-@keyframes loading {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
+.loader-video {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
 }
 
 body.loaded .loader-container {
@@ -533,393 +493,50 @@ body.loaded .loader-container {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Responsive Design */
+/* Responsive Design - Preserving Exact Layout */
 
 /* Base responsive settings */
 html {
   font-size: 62.5%; /* 10px base size */
 }
 
-/* Large screens (default) */
-/* Your existing styles remain unchanged */
-
-/* Medium-sized laptops and tablets (landscape) */
+/* For all screen sizes, maintain the same container width */
 @media (max-width: 1200px) {
-  html {
-    font-size: 56.25%; /* 9px base */
-  }
   
-  .container {
-    max-width: 100rem;
-  }
-  
-  .hero-text {
-    right: 80px;
-    bottom: 200px;
-    font-size: 5.6rem;
-  }
-  
-  .vision-container {
-    height: 35rem;
-  }
-  
-  .sub-heading,
-  .our-work-title,
-  .company-title {
-    font-size: 5.6rem;
-  }
-  
-  .vision-p,
-  .Company-Concept-text {
-    font-size: 2.4rem;
-  }
 }
 
-/* Tablets (portrait) and smaller laptops */
 @media (max-width: 992px) {
-  html {
-    font-size: 50%; /* 8px base */
-  }
-  
   .container {
-    max-width: 85rem;
-  }
-  
-  .logo img {
-    width: 20%;
-  }
-  
-  .hero-text {
-    right: 60px;
-    bottom: 150px;
-    font-size: 5rem;
-  }
-  
-  .vision-container {
-    margin-top: -8rem;
-  }
-  
-  .vision {
-    flex-direction: column-reverse;
-    align-items: center;
-    text-align: center;
-    padding: 2rem;
-  }
-  
-  .vision-text {
-    max-width: 100%;
-    padding-top: 2rem;
-  }
-  
-  .vision-img img {
-    height: auto;
-    width: 15rem;
-  }
-  
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 18rem);
-  }
-  
-  .third-img {
-    grid-column: 1/2;
-    grid-row: 2/3;
-  }
-  
-  .img-right-side {
-    grid-column: 2/3;
-    grid-row: 2/3;
-  }
-  
-  .company-concept {
-    height: auto;
-    grid-template-columns: 1fr;
-    grid-template-rows: 30rem auto;
-  }
-  
-  .Company-Concept-content {
-    text-align: center;
-    padding: 5rem;
-  }
-  
-  .decoration-img img {
-    width: 20rem;
-    height: 20rem;
-  }
-  
-  .footer {
-    height: auto;
-    padding: 6rem 2rem;
-    gap: 5rem;
-  }
-  
-  .footer-logo {
-    width: 20%;
-  }
-  
-  .social-media {
-    width: 10%;
+    /* transform: scale(0.8); */
   }
 }
 
-/* Large smartphones */
 @media (max-width: 768px) {
-  html {
-    font-size: 43.75%; /* 7px base */
-  }
-  
   .container {
-    padding: 0 2rem;
-  }
-  
-  .logo img {
-    width: 25%;
-  }
-  
-  .hero-text {
-    right: 40px;
-    bottom: 100px;
-    font-size: 4.4rem;
-  }
-  
-  .vision-container {
-    margin-top: -6rem;
-    height: 40rem;
-  }
-  
-  .sub-heading,
-  .our-work-title,
-  .company-title {
-    font-size: 4.8rem;
-    margin-bottom: 2rem;
-  }
-  
-  .vision-p,
-  .Company-Concept-text {
-    font-size: 2.2rem;
-  }
-  
-  .grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, 20rem);
-    gap: 1.5rem;
-  }
-  
-  .first-img, .second-img, .third-img, .img-right-side {
-    grid-column: 1;
-  }
-  
-  .first-img {
-    grid-row: 1;
-  }
-  
-  .second-img {
-    grid-row: 2;
-  }
-  
-  .third-img {
-    grid-row: 3;
-  }
-  
-  .img-right-side {
-    grid-row: 4;
-  }
-  
-  .company-img {
-    height: 25rem;
-  }
-  
-  .Company-Concept-content {
-    padding: 3rem;
-  }
-  
-  .footer-logo {
-    width: 30%;
-  }
-  
-  .social-media {
-    width: 15%;
+    /* transform: scale(0.7); */
   }
 }
 
-/* Small smartphones */
 @media (max-width: 576px) {
-  html {
-    font-size: 37.5%; /* 6px base */
-  }
-  
   .container {
-    padding: 0 1.5rem;
-  }
-  
-  .header {
-    margin-top: 1rem;
-  }
-  
-  .logo {
-    padding: 1rem 0;
-  }
-  
-  .logo img {
-    width: 30%;
-  }
-  
-  .hero-text {
-    right: 20px;
-    bottom: 60px;
-    font-size: 3.8rem;
-  }
-  
-  .vision-container {
-    margin-top: -4rem;
-    height: 45rem;
-  }
-  
-  .vision {
-    padding: 1.5rem;
-  }
-  
-  .sub-heading,
-  .our-work-title,
-  .company-title {
-    font-size: 4.2rem;
-  }
-  
-  .vision-p,
-  .Company-Concept-text {
-    font-size: 2rem;
-    line-height: 1.5;
-  }
-  
-  .our-work, .Company {
-    padding: 0 1.5rem;
-  }
-  
-  .company-img {
-    height: 20rem;
-  }
-  
-  .Company-Concept-content {
-    padding: 2rem;
-  }
-  
-  .decoration-img img {
-    width: 15rem;
-    height: 15rem;
-  }
-  
-  .footer {
-    padding: 5rem 1.5rem;
-    gap: 4rem;
-  }
-  
-  .footer-logo {
-    width: 40%;
-  }
-  
-  .social-media {
-    width: 20%;
-  }
-  
-  /* Adjust loader for small screens */
-  .loader-logo {
-    width: 15rem;
-  }
-  
-  .loader-bar {
-    width: 15rem;
+    /* transform: scale(0.6); */
   }
 }
 
-/* Extra small devices */
 @media (max-width: 375px) {
-  html {
-    font-size: 31.25%; /* 5px base */
-  }
-  
-  .logo img {
-    width: 40%;
-  }
-  
-  .hero-text {
-    right: 15px;
-    bottom: 40px;
-    font-size: 3.4rem;
-  }
-  
-  .vision-container {
-    height: 50rem;
-  }
-  
-  .sub-heading,
-  .our-work-title,
-  .company-title {
-    font-size: 3.8rem;
-  }
-  
-  .vision-p,
-  .Company-Concept-text {
-    font-size: 1.8rem;
-  }
-  
-  /* Ensure the loader is visible on tiny screens */
-  .loader-logo {
-    width: 12rem;
-  }
-  
-  .loader-bar {
-    width: 12rem;
+  .container {
+    /* transform: scale(0.5); */
   }
 }
 
-/* Fix for vision section on very small heights */
-@media (max-height: 700px) {
-  .vision-container {
-    margin-top: -5rem;
-    height: 40rem;
-  }
-  
-  .vision {
-    padding: 1.5rem;
-  }
-  
-  .vision-text {
-    padding-top: 1rem;
-  }
-  
-  .sub-heading {
-    margin-bottom: 1.5rem;
-  }
-}
-
-/* Ensure RTL text alignment is maintained */
-@media (max-width: 992px) {
-  .vision-text, .Company-Concept-content {
-    text-align: right;
-  }
-}
-
-/* Fix for dynamic content on smaller screens */
-@media (max-width: 768px) {
-  .dynamic-content {
-    height: auto;
-    min-height: 50rem;
-  }
-  
-  .slide-inner {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-  }
-  
-  .slide-inner > div:first-child {
-    order: 2;
-    padding: 3rem;
-  }
-  
-  .slide-image {
-    order: 1;
-    border-radius: 1.2rem 1.2rem 0 0;
-  }
+/* Ensure the loader is properly sized on all screens */
+.loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
 }
 
 /* Ensure AOS animations work well on mobile */

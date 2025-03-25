@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const visionSection = document.querySelector('.vision-container');
   const workImages = document.querySelectorAll('.work-img');
   const ourWorkSection = document.querySelector('.our-work');
+  const loaderVideo = document.querySelector('.loader-video');
   
   let currentSlide = 0;
   let isAnimating = false;
@@ -18,10 +19,24 @@ document.addEventListener('DOMContentLoaded', function() {
     mirror: false
   });
   
-  // Loader animation
-  setTimeout(function() {
-    document.body.classList.add('loaded');
-  }, 2000);
+  // Loader animation - wait for video to end
+  if (loaderVideo) {
+    loaderVideo.addEventListener('ended', function() {
+      document.body.classList.add('loaded');
+    });
+    
+    // Fallback in case video doesn't load or has issues
+    setTimeout(function() {
+      if (!document.body.classList.contains('loaded')) {
+        document.body.classList.add('loaded');
+      }
+    }, 5000);
+  } else {
+    // If video element doesn't exist, use the timeout
+    setTimeout(function() {
+      document.body.classList.add('loaded');
+    }, 2000);
+  }
   
   // Function to animate work images with flip effect
   function animateWorkImages() {

@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link rel="icon" href="./img/dark-logo.png" type="image/x-icon" />
@@ -14,8 +14,9 @@
   <body>
     <div class="loader-container">
       <div class="loader">
-        <img src="img/dark-logo.png" alt="SUAV Logo" class="loader-logo">
-        <div class="loader-bar"></div>
+        <video autoplay muted class="loader-video">
+          <source src="./vid/loading-animation.mp4" type="video/mp4" />
+        </video>
       </div>
     </div>
 
