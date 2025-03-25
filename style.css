@@ -1,0 +1,930 @@
+/*
+--- 01 TYPOGRAPHY SYSTEM
+
+- Font sizes (px)
+10 / 12 / 14 / 16 / 18 / 20 / 24 / 30 / 36 / 44 / 52 / 62 / 74 / 86 / 98
+
+- Font weights
+Default: 400
+Medium: 500
+Semi-bold: 600
+Bold: 700
+
+- Line heights
+Default: 1
+Small: 1.05
+Medium: 1.2
+Paragraph default: 1.6
+
+- Letter spacing
+-0.5px
+0.75px
+
+--- 02 COLORS
+
+- Primary: #e67e22
+- Tints:
+#fdf2e9
+#fae5d3
+#eb984e
+
+- Shades: 
+#cf711f
+#45260a
+
+- Accents:
+- Greys
+
+#888
+#767676 (lightest grey allowed on #fff)
+#6f6f6f (lightest grey allowed on #fdf2e9)
+#555
+#333
+
+--- 05 SHADOWS
+
+0 2.4rem 4.8rem rgba(0, 0, 0, 0.075);
+
+--- 06 BORDER-RADIUS
+
+Default: 9px
+Medium: 11px
+
+--- 07 WHITESPACE
+
+- Spacing system (px)
+2 / 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 80 / 96 / 128
+*/
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  /* font-size: 10px; */
+  /* 10px / 16px = 0.625 = 62.5% */
+  /* Percentage of user's browser font-size setting */
+  font-family: "AbarHigh";
+  font-size: 62.5%;
+}
+
+body {
+  line-height: 1;
+  font-weight: 500;
+  color: black;
+}
+
+.container {
+  max-width: 120rem;
+  padding: 0 3.2rem;
+  margin: 0 auto;
+}
+
+/**********************************/
+/*********Header********/
+/**********************************/
+.header {
+  display: flex;
+  justify-content: center;
+  border-radius: 1.2rem;
+  margin-top: 2rem;
+}
+
+.logo {
+  /* background-color: aliceblue; */
+  max-width: 88rem;
+  background-color: #7a0034;
+  padding: 1.5rem 0;
+  border-radius: 1.2rem;
+  display: flex;
+  justify-content: center;
+  z-index: 999;
+}
+
+.logo img {
+  width: 15%;
+}
+
+/**********************************/
+/*********Hero Section********/
+/**********************************/
+.hero-banner video {
+  max-width: 100%;
+  border-radius: 1.2rem;
+  margin-top: -3rem;
+  z-index: -1;
+}
+
+.hero-banner {
+  display: flex;
+  position: relative;
+}
+
+.hero-text {
+  position: absolute;
+  right: 100px;
+  bottom: 250px;
+  font-size: 6.2rem;
+  line-height: 1.2;
+  color: #7a0034;
+  text-align: right;
+}
+
+.margon-bottom {
+  margin-bottom: 6.4rem;
+}
+
+.vision-container {
+  position: relative;
+  height: 30rem;
+  perspective: 1000px;
+  margin-top: -11rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.vision {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  max-width: 100rem;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 3rem;
+  background-color: #f3f3f3;
+  border: solid 3px white;
+  text-align: right;
+  border-radius: 1.2rem;
+  transition: transform 0.8s ease, opacity 0.8s ease;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  opacity: 0;
+  visibility: hidden;
+  margin: 0 auto;
+}
+
+.vision.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateZ(0) translateY(0);
+}
+
+.vision:not(.active) {
+  transform: translateZ(-100px) translateY(50px);
+}
+
+.vision-slide.slide-out {
+  animation: slideOut 0.8s forwards;
+}
+
+.vision-slide.slide-in {
+  animation: slideIn 0.8s forwards;
+}
+
+@keyframes slideOut {
+  0% {
+    opacity: 1;
+    transform: translateZ(0) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateZ(-100px) translateY(50px);
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateZ(-100px) translateY(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateZ(0) translateY(0);
+  }
+}
+
+.vision-text {
+  max-width: 50rem;
+  padding-top: 5rem;
+}
+
+.sub-heading {
+  font-size: 6.4rem;
+  font-weight: 600;
+  color: #7a0034;
+
+  margin-bottom: 3.6rem;
+}
+
+.vision-p {
+  font-size: 2.8rem;
+}
+
+.vision-img img {
+  height: 100%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 20rem);
+  gap: 2rem;
+  overflow: hidden;
+}
+
+.our-work-title {
+  font-size: 6.4rem;
+  color: #7a0034;
+  margin-bottom: 3rem;
+}
+
+.our-work {
+  /* background-color: blue; */
+  padding: 0 4rem;
+}
+.our-work-title {
+  text-align: center;
+  grid-column: 1/4;
+}
+
+.work-img {
+  border-radius: 1.2rem;
+  background-color: #7a0034;
+  object-fit: cover;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.work-img.flip-in {
+  transform: translateX(0) translateY(0);
+  opacity: 1;
+}
+
+.first-img {
+  background-image: url("img/1.01.png");
+}
+
+.second-img {
+  background-image: url("img/Layer\ 1.png");
+}
+
+.third-img {
+  background-image: url("img/1.03.png");
+  grid-row: 2/3;
+  grid-column: 1/3;
+}
+
+.img-right-side {
+  background-image: url("img/3.png");
+  grid-column: 3/4;
+  grid-row: 1/3;
+}
+
+.Company {
+  padding: 0 4rem;
+}
+
+.company-concept {
+  background-color: #f3f3f3;
+  border-radius: 1.2rem;
+  height: 50rem;
+  display: grid;
+  padding: 0;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.company-img {
+  background-image: url("img/Event.png");
+  background-size: 100% 100%;
+  border-radius: 1.2rem;
+}
+
+.Company-Concept-content {
+  text-align: right;
+  padding: 11rem 5rem;
+}
+
+.company-title {
+  font-size: 6.4rem;
+  font-weight: 600;
+  color: #7a0034;
+
+  margin-bottom: 3rem;
+}
+
+.Company-Concept-text {
+  font-size: 2.8rem;
+  line-height: 1.7;
+}
+
+.decoration {
+  display: flex;
+  justify-content: center;
+}
+
+.decoration-img img {
+  width: 25rem;
+  height: 25rem;
+}
+
+.decoration {
+  margin-bottom: 6.4rem;
+}
+
+.footer-logo {
+  width: 15%;
+}
+
+.footer-logo img {
+  width: 100%;
+}
+
+.social-media {
+  width: 7%;
+}
+
+.social-media img {
+  width: 100%;
+  filter: invert(88%) sepia(100%) saturate(1%) hue-rotate(179deg)
+    brightness(111%) contrast(97%);
+}
+
+.footer p {
+  color: white;
+  font-size: 1.3rem;
+}
+
+.footer {
+  background-color: #7a0034;
+  height: 45rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 9rem;
+  padding-top: 10rem;
+}
+
+.dynamic-content {
+  position: relative;
+  height: 50rem;
+  margin: 6.4rem 0;
+  overflow: hidden;
+}
+
+.content-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease, visibility 0.8s;
+  background-color: #f3f3f3;
+  border-radius: 1.2rem;
+}
+
+.content-slide.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.slide-inner {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  height: 100%;
+}
+
+.slide-title {
+  font-size: 6.4rem;
+  font-weight: 600;
+  color: #7a0034;
+  margin-bottom: 3rem;
+  text-align: right;
+}
+
+.slide-text {
+  font-size: 2.8rem;
+  line-height: 1.7;
+  text-align: right;
+}
+
+.slide-image {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 1.2rem 0 0 1.2rem;
+}
+
+.slide-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slide-inner > div:first-child {
+  padding: 5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Loader Animation */
+.loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease-out, visibility 0.5s;
+}
+
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-logo {
+  width: 20rem;
+  animation: pulse 2s infinite alternate, rotate 4s infinite;
+  transform-origin: center;
+}
+
+.loader-bar {
+  width: 20rem;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #7a0034, transparent);
+  margin-top: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.loader-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+  animation: loading 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    filter: brightness(0.9);
+  }
+  100% {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(5deg) scale(1.05);
+  }
+  50% {
+    transform: rotate(0deg) scale(1);
+  }
+  75% {
+    transform: rotate(-5deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes loading {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+body.loaded .loader-container {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Add a subtle scale effect on hover */
+.work-img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Responsive Design */
+
+/* Base responsive settings */
+html {
+  font-size: 62.5%; /* 10px base size */
+}
+
+/* Large screens (default) */
+/* Your existing styles remain unchanged */
+
+/* Medium-sized laptops and tablets (landscape) */
+@media (max-width: 1200px) {
+  html {
+    font-size: 56.25%; /* 9px base */
+  }
+  
+  .container {
+    max-width: 100rem;
+  }
+  
+  .hero-text {
+    right: 80px;
+    bottom: 200px;
+    font-size: 5.6rem;
+  }
+  
+  .vision-container {
+    height: 35rem;
+  }
+  
+  .sub-heading,
+  .our-work-title,
+  .company-title {
+    font-size: 5.6rem;
+  }
+  
+  .vision-p,
+  .Company-Concept-text {
+    font-size: 2.4rem;
+  }
+}
+
+/* Tablets (portrait) and smaller laptops */
+@media (max-width: 992px) {
+  html {
+    font-size: 50%; /* 8px base */
+  }
+  
+  .container {
+    max-width: 85rem;
+  }
+  
+  .logo img {
+    width: 20%;
+  }
+  
+  .hero-text {
+    right: 60px;
+    bottom: 150px;
+    font-size: 5rem;
+  }
+  
+  .vision-container {
+    margin-top: -8rem;
+  }
+  
+  .vision {
+    flex-direction: column-reverse;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .vision-text {
+    max-width: 100%;
+    padding-top: 2rem;
+  }
+  
+  .vision-img img {
+    height: auto;
+    width: 15rem;
+  }
+  
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 18rem);
+  }
+  
+  .third-img {
+    grid-column: 1/2;
+    grid-row: 2/3;
+  }
+  
+  .img-right-side {
+    grid-column: 2/3;
+    grid-row: 2/3;
+  }
+  
+  .company-concept {
+    height: auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: 30rem auto;
+  }
+  
+  .Company-Concept-content {
+    text-align: center;
+    padding: 5rem;
+  }
+  
+  .decoration-img img {
+    width: 20rem;
+    height: 20rem;
+  }
+  
+  .footer {
+    height: auto;
+    padding: 6rem 2rem;
+    gap: 5rem;
+  }
+  
+  .footer-logo {
+    width: 20%;
+  }
+  
+  .social-media {
+    width: 10%;
+  }
+}
+
+/* Large smartphones */
+@media (max-width: 768px) {
+  html {
+    font-size: 43.75%; /* 7px base */
+  }
+  
+  .container {
+    padding: 0 2rem;
+  }
+  
+  .logo img {
+    width: 25%;
+  }
+  
+  .hero-text {
+    right: 40px;
+    bottom: 100px;
+    font-size: 4.4rem;
+  }
+  
+  .vision-container {
+    margin-top: -6rem;
+    height: 40rem;
+  }
+  
+  .sub-heading,
+  .our-work-title,
+  .company-title {
+    font-size: 4.8rem;
+    margin-bottom: 2rem;
+  }
+  
+  .vision-p,
+  .Company-Concept-text {
+    font-size: 2.2rem;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, 20rem);
+    gap: 1.5rem;
+  }
+  
+  .first-img, .second-img, .third-img, .img-right-side {
+    grid-column: 1;
+  }
+  
+  .first-img {
+    grid-row: 1;
+  }
+  
+  .second-img {
+    grid-row: 2;
+  }
+  
+  .third-img {
+    grid-row: 3;
+  }
+  
+  .img-right-side {
+    grid-row: 4;
+  }
+  
+  .company-img {
+    height: 25rem;
+  }
+  
+  .Company-Concept-content {
+    padding: 3rem;
+  }
+  
+  .footer-logo {
+    width: 30%;
+  }
+  
+  .social-media {
+    width: 15%;
+  }
+}
+
+/* Small smartphones */
+@media (max-width: 576px) {
+  html {
+    font-size: 37.5%; /* 6px base */
+  }
+  
+  .container {
+    padding: 0 1.5rem;
+  }
+  
+  .header {
+    margin-top: 1rem;
+  }
+  
+  .logo {
+    padding: 1rem 0;
+  }
+  
+  .logo img {
+    width: 30%;
+  }
+  
+  .hero-text {
+    right: 20px;
+    bottom: 60px;
+    font-size: 3.8rem;
+  }
+  
+  .vision-container {
+    margin-top: -4rem;
+    height: 45rem;
+  }
+  
+  .vision {
+    padding: 1.5rem;
+  }
+  
+  .sub-heading,
+  .our-work-title,
+  .company-title {
+    font-size: 4.2rem;
+  }
+  
+  .vision-p,
+  .Company-Concept-text {
+    font-size: 2rem;
+    line-height: 1.5;
+  }
+  
+  .our-work, .Company {
+    padding: 0 1.5rem;
+  }
+  
+  .company-img {
+    height: 20rem;
+  }
+  
+  .Company-Concept-content {
+    padding: 2rem;
+  }
+  
+  .decoration-img img {
+    width: 15rem;
+    height: 15rem;
+  }
+  
+  .footer {
+    padding: 5rem 1.5rem;
+    gap: 4rem;
+  }
+  
+  .footer-logo {
+    width: 40%;
+  }
+  
+  .social-media {
+    width: 20%;
+  }
+  
+  /* Adjust loader for small screens */
+  .loader-logo {
+    width: 15rem;
+  }
+  
+  .loader-bar {
+    width: 15rem;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+  html {
+    font-size: 31.25%; /* 5px base */
+  }
+  
+  .logo img {
+    width: 40%;
+  }
+  
+  .hero-text {
+    right: 15px;
+    bottom: 40px;
+    font-size: 3.4rem;
+  }
+  
+  .vision-container {
+    height: 50rem;
+  }
+  
+  .sub-heading,
+  .our-work-title,
+  .company-title {
+    font-size: 3.8rem;
+  }
+  
+  .vision-p,
+  .Company-Concept-text {
+    font-size: 1.8rem;
+  }
+  
+  /* Ensure the loader is visible on tiny screens */
+  .loader-logo {
+    width: 12rem;
+  }
+  
+  .loader-bar {
+    width: 12rem;
+  }
+}
+
+/* Fix for vision section on very small heights */
+@media (max-height: 700px) {
+  .vision-container {
+    margin-top: -5rem;
+    height: 40rem;
+  }
+  
+  .vision {
+    padding: 1.5rem;
+  }
+  
+  .vision-text {
+    padding-top: 1rem;
+  }
+  
+  .sub-heading {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Ensure RTL text alignment is maintained */
+@media (max-width: 992px) {
+  .vision-text, .Company-Concept-content {
+    text-align: right;
+  }
+}
+
+/* Fix for dynamic content on smaller screens */
+@media (max-width: 768px) {
+  .dynamic-content {
+    height: auto;
+    min-height: 50rem;
+  }
+  
+  .slide-inner {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  
+  .slide-inner > div:first-child {
+    order: 2;
+    padding: 3rem;
+  }
+  
+  .slide-image {
+    order: 1;
+    border-radius: 1.2rem 1.2rem 0 0;
+  }
+}
+
+/* Ensure AOS animations work well on mobile */
+@media (max-width: 768px) {
+  [data-aos] {
+    transition-duration: 600ms !important;
+  }
+}
