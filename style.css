@@ -93,8 +93,12 @@ Medium: 11px
 
 body {
   font-family: 'AbarHigh', sans-serif;
+  background-color: #7a0034;
 }
 
+.logo {
+  background-color: #c4a891!important;
+}
 * {
   margin: 0;
   padding: 0;
@@ -280,7 +284,7 @@ body {
 
 .our-work-title {
   font-size: 6.4rem;
-  color: #7a0034;
+  color: #fff;
   margin-bottom: 3rem;
   font-weight: 700!important;
 }
