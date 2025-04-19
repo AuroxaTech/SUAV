@@ -1,15 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
   const visionSlides = document.querySelectorAll('.vision-slide');
-  const visionSection = document.querySelector('.vision-container');
   const workImages = document.querySelectorAll('.work-img');
   const ourWorkSection = document.querySelector('.our-work');
   const loaderVideo = document.querySelector('.loader-video');
   
-  let currentSlide = 0;
-  let isAnimating = false;
-  let allSlidesViewed = false;
-  let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
   let isWorkSectionVisible = false;
+  let visionAnimationDone = false;
   
   // Initialize AOS
   AOS.init({
@@ -19,23 +15,48 @@ document.addEventListener('DOMContentLoaded', function() {
     mirror: false
   });
   
+  // Make sure all vision slides are hidden initially
+  visionSlides.forEach(slide => {
+    slide.classList.remove('active');
+  });
+  
   // Loader animation - wait for video to end
   if (loaderVideo) {
     loaderVideo.addEventListener('ended', function() {
       document.body.classList.add('loaded');
+      // Show first vision slide with animation after loader completes
+      showVisionWithAnimation();
     });
     
     // Fallback in case video doesn't load or has issues
     setTimeout(function() {
       if (!document.body.classList.contains('loaded')) {
         document.body.classList.add('loaded');
+        showVisionWithAnimation();
       }
     }, 5000);
   } else {
     // If video element doesn't exist, use the timeout
     setTimeout(function() {
       document.body.classList.add('loaded');
+      showVisionWithAnimation();
     }, 2000);
+  }
+  
+  // Function to show vision with animation
+  function showVisionWithAnimation() {
+    if (visionAnimationDone) return; // Prevent multiple animations
+    
+    // Add a small delay to ensure hero section is visible first
+    setTimeout(() => {
+      if (visionSlides.length > 0) {
+        // Add the active class to make it visible
+        visionSlides[0].classList.add('active');
+        
+        // Mark animation as done
+        visionAnimationDone = true;
+      }
+    }, 500);
   }
   
   // Function to animate work images with flip effect
@@ -65,47 +86,8 @@ document.addEventListener('DOMContentLoaded', function() {
     );
   }
   
-  // Function to change slides
-  function changeVisionSlide(direction) {
-    if (isAnimating || allSlidesViewed) return;
-    
-    isAnimating = true;
-    
-    // Get current and next slide indexes
-    let nextSlide;
-    if (direction === 'down') {
-      nextSlide = (currentSlide + 1) % visionSlides.length;
-    } else {
-      nextSlide = (currentSlide - 1 + visionSlides.length) % visionSlides.length;
-    }
-    
-    // Add animation classes
-    visionSlides[currentSlide].classList.add('slide-out');
-    visionSlides[currentSlide].classList.remove('active');
-    
-    setTimeout(() => {
-      visionSlides[nextSlide].classList.add('slide-in', 'active');
-      
-      // Update current slide
-      currentSlide = nextSlide;
-      
-      // Check if we've viewed all slides
-      if (currentSlide === visionSlides.length - 1) {
-        allSlidesViewed = true;
-      }
-      
-      // Remove animation classes after animation completes
-      setTimeout(() => {
-        visionSlides.forEach(slide => {
-          slide.classList.remove('slide-in', 'slide-out');
-        });
-        isAnimating = false;
-      }, 800);
-    }, 400);
-  }
-  
-  // Check for animations on scroll
-  window.addEventListener('scroll', function() {
+  // Check for animations on scroll - only for work section
+  window.addEventListener('scroll', debounce(function() {
     // Check if work section is in viewport
     const workSectionVisible = isInViewport(ourWorkSection);
     
@@ -116,74 +98,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update section visibility state
     isWorkSectionVisible = workSectionVisible;
-    
-    // If all slides have been viewed, allow normal scrolling
-    if (allSlidesViewed) return;
-    
-    const st = window.pageYOffset || document.documentElement.scrollTop;
-    const visionPosition = visionSection.getBoundingClientRect();
-    
-    // Check if vision section is in viewport and we're animating
-    if (visionPosition.top < window.innerHeight && 
-        visionPosition.bottom > 0 && 
-        isAnimating) {
-      // Keep the page position fixed during animation
-      window.scrollTo(0, lastScrollTop);
-    } else {
-      // Update last scroll position when not animating
-      lastScrollTop = st <= 0 ? 0 : st;
-    }
-  });
+  }, 50));
   
-  // Handle wheel events to change slides without scrolling
-  window.addEventListener('wheel', function(e) {
-    // If all slides have been viewed, allow normal scrolling
-    if (allSlidesViewed) return;
-    
-    const visionPosition = visionSection.getBoundingClientRect();
-    
-    // Check if vision section is in viewport
-    if (visionPosition.top < window.innerHeight && visionPosition.bottom > 0) {
-      // Determine scroll direction
-      if (e.deltaY > 0 && currentSlide < visionSlides.length - 1) {
-        // Scrolling down
-        e.preventDefault();
-        changeVisionSlide('down');
-      } else if (e.deltaY < 0 && currentSlide > 0) {
-        // Scrolling up
-        e.preventDefault();
-        changeVisionSlide('up');
-      }
-    }
-  }, { passive: false });
-  
-  // Touch events for mobile
-  let touchStartY = 0;
-  
-  document.addEventListener('touchstart', function(e) {
-    touchStartY = e.touches[0].clientY;
-  }, { passive: true });
-  
-  document.addEventListener('touchmove', function(e) {
-    // If all slides have been viewed, allow normal scrolling
-    if (allSlidesViewed) return;
-    
-    const visionPosition = visionSection.getBoundingClientRect();
-    
-    // Check if vision section is in viewport
-    if (visionPosition.top < window.innerHeight && visionPosition.bottom > 0) {
-      const touchY = e.touches[0].clientY;
-      const diff = touchStartY - touchY;
-      
-      if (diff > 5 && !isAnimating && currentSlide < visionSlides.length - 1) { // Scrolling down
-        e.preventDefault();
-        changeVisionSlide('down');
-      } else if (diff < -5 && !isAnimating && currentSlide > 0) { // Scrolling up
-        e.preventDefault();
-        changeVisionSlide('up');
-      }
-      
-      touchStartY = touchY;
-    }
-  }, { passive: false });
+  // Debounce function to limit scroll events
+  function debounce(func, wait) {
+    let timeout;
+    return function() {
+      const context = this;
+      const args = arguments;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+  }
 });
