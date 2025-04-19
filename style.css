@@ -163,10 +163,10 @@ body {
 
 .hero-text {
   position: absolute;
-  right: 60px;
+  right: 100px;
   bottom: 250px;
   font-size: 6.2rem;
-  line-height: 1.7;
+  line-height: 1.2;
   color: #7a0034;
   text-align: right;
   font-weight: 700;
@@ -184,7 +184,6 @@ body {
   display: flex;
   justify-content: center;
   width: 100%;
-  z-index: 10;
 }
 
 .vision {
@@ -201,7 +200,9 @@ body {
   border: solid 3px white;
   text-align: right;
   border-radius: 1.2rem;
-  transition: opacity 0.8s ease, visibility 0.8s ease;
+  transition: transform 0.8s ease, opacity 0.8s ease;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
   opacity: 0;
   visibility: hidden;
   margin: 0 auto;
@@ -210,16 +211,46 @@ body {
 .vision.active {
   opacity: 1;
   visibility: visible;
+  transform: translateZ(0) translateY(0);
 }
 
 .vision:not(.active) {
-  opacity: 0;
-  visibility: hidden;
+  transform: translateZ(-100px) translateY(50px);
+}
+
+.vision-slide.slide-out {
+  animation: slideOut 0.8s forwards;
+}
+
+.vision-slide.slide-in {
+  animation: slideIn 0.8s forwards;
+}
+
+@keyframes slideOut {
+  0% {
+    opacity: 1;
+    transform: translateZ(0) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateZ(-100px) translateY(50px);
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateZ(-100px) translateY(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateZ(0) translateY(0);
+  }
 }
 
 .vision-text {
   max-width: 50rem;
-  padding-top: 3rem;
+  padding-top: 5rem;
 }
 
 .sub-heading {
@@ -233,7 +264,6 @@ body {
 .vision-p {
   font-size: 2.8rem;
   font-weight: 400;
-  line-height: 1.5;
 }
 
 .vision-img img {
@@ -318,7 +348,7 @@ body {
 }
 
 .Company-Concept-content {
-  text-align: right; 
+  text-align: right;
   padding: 11rem 5rem;
 }
 
@@ -368,8 +398,8 @@ body {
   width: 40px;
   height: 40px;
   object-fit: contain;
-  filter: invert(88%) sepia(100%) saturate(1%) hue-rotate(179deg)
-    brightness(111%) contrast(97%);
+  /* filter: invert(88%) sepia(100%) saturate(1%) hue-rotate(179deg)
+    brightness(111%) contrast(97%); */
 }
 .social-media img.whatsapp,.social-media img.insta {
   
