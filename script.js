@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     duration: 800,
     easing: 'ease-out-cubic',
     once: false,
-    mirror: false
+    mirror: true
   });
   
   // Make sure all vision slides are hidden initially
@@ -179,15 +179,55 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
   
-  // Add a test button for debugging
-  const debugButton = document.createElement('button');
-  debugButton.textContent = 'Next Slide (Debug)';
-  debugButton.style.position = 'fixed';
-  debugButton.style.bottom = '10px';
-  debugButton.style.right = '10px';
-  debugButton.style.zIndex = '9999';
-  debugButton.addEventListener('click', showNextVisionSlide);
-  document.body.appendChild(debugButton);
   
   console.log('Script setup complete');
+  
+  // Theme toggle functionality
+  const themeToggle = document.getElementById('themeToggle');
+  
+  // Check for saved theme preference or respect OS preference
+  const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+  const savedTheme = localStorage.getItem('theme');
+  
+  // If the user has explicitly chosen a theme, use it
+  if (savedTheme === 'dark') {
+    document.body.classList.add('darkTheme');
+  } else if (savedTheme === 'light') {
+    document.body.classList.remove('darkTheme');
+  } else {
+    // Otherwise, respect OS preference
+    if (prefersDarkScheme.matches) {
+      document.body.classList.add('darkTheme');
+    }
+  }
+  
+  // Update button appearance based on current theme
+  updateThemeToggle();
+  
+  // Add click event to toggle theme
+  themeToggle.addEventListener('click', function() {
+    // Toggle darkTheme class on body
+    document.body.classList.toggle('darkTheme');
+    
+    // Save user preference
+    if (document.body.classList.contains('darkTheme')) {
+      localStorage.setItem('theme', 'dark');
+    } else {
+      localStorage.setItem('theme', 'light');
+    }
+    
+    // Update button appearance
+    updateThemeToggle();
+  });
+  
+  // Function to update toggle button appearance
+  function updateThemeToggle() {
+    const isDark = document.body.classList.contains('darkTheme');
+    const sunIcon = document.querySelector('.sun-icon');
+    const moonIcon = document.querySelector('.moon-icon');
+    
+    // Update icon visibility based on current theme
+    sunIcon.style.display = isDark ? 'none' : 'block';
+    moonIcon.style.display = isDark ? 'block' : 'none';
+  }
 });
