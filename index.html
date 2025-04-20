@@ -5,13 +5,10 @@
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-    <link rel="icon" href="./img/dark-logo.png" type="image/x-icon" />
-    <script src="./script.js"></script>
-    <title>SUAV</title>
-    
-
+    <title>Document</title>
   </head>
   <body>
+
     <div class="loader-container">
       <div class="loader">
         <video autoplay muted class="loader-video">
@@ -20,16 +17,17 @@
       </div>
     </div>
 
+
     <header class="header container">
       <div class="logo container">
-        <img src="img/SUAV LOGO.png" />
+        <a href="#"> <img src="img/SUAV LOGO.png" /></a>
       </div>
     </header>
 
     <section class="hero container">
       <div class="hero-banner">
         <video autoplay loop>
-          <source src="./vid/Hero-Video.mp4" type="video/mp4" />
+          <source src="vid/Hero-Video.mp4" type="video/mp4" />
         </video>
 
         <h1 class="hero-text">
@@ -82,24 +80,48 @@
       </div>
     </section>
 
+
+    <!-- <section class="content margon-bottom container">
+      <div class="vision container">
+        <div class="vision-img">
+          <img src="img/decoration.png" />
+        </div>
+        <div class="vision-text">
+          <h2 class="sub-heading">الرؤية</h2>
+
+          <p class="vision-p">
+            أن نكون الرواد في تحويل الأحلام إلى واقع نابض بالحياة، حيث تمتزج
+            الألوان والزوايا بإبداع وإتقان لصنع تجارب استثنائية تبقى خالدة في
+            الذاكرة.
+          </p>
+        </div>
+      </div>
+    </section> -->
+
     <section class="our-work margon-bottom container">
-      <h2 class="our-work-title" data-aos="fade-up">أعمالنا</h2>
+      <h2 class="our-work-title">أعمالنا</h2>
       <div class="grid">
-        <div class="work-img first-img" data-aos="fade-right" data-aos-delay="100"></div>
-        <div class="work-img second-img" data-aos="fade-right" data-aos-delay="200"></div>
-        <div class="work-img third-img" data-aos="fade-up" data-aos-delay="300"></div>
-        <div class="img-right-side work-img" data-aos="fade-left" data-aos-delay="200"></div>
+        <div class="work-img first-img" data-aos="flip-left" data-aos-duration="1000">
+          <img src="img/wow (2).jpg" />
+        </div>
+        <div class="work-img second-img" data-aos="flip-right" data-aos-duration="1000" data-aos-delay="200"></div>
+        <div class="third-img" data-aos="flip-up" data-aos-duration="1000" data-aos-delay="400">
+          <img src="img/wedding-hall.PNG" />
+        </div>
+        <div class="img-right-side work-img" data-aos="flip-down" data-aos-duration="1000" data-aos-delay="600">
+          <img src="img/amazing-view.PNG" />
+        </div>
       </div>
     </section>
 
     <section class="Company margon-bottom container">
       <div class="company-concept">
-        <div class="company-img"></div>
+        <div class="company-img"><img src="img/flowers.jpg" /></div>
         <div class="Company-Concept-content">
-          <h2 class="company-title">عمل لشركة</h2>
+          <h2 class="company-title">عمل الشركة</h2>
           <p class="Company-Concept-text">
             نحوّل خيالك إلى واقع بألوانه وزواياه، حيث يلتقي الإبداع والإتقان
-            للتفاصيل الدقيقة لخلق تجربة تعانق ذكرياتك للأبد.
+            للتفاصيل الدقيقة لخلق تجربة تعانق ذكرياتك للأبد
           </p>
         </div>
       </div>
@@ -113,24 +135,37 @@
 
     <footer class="footer">
       <div class="footer-logo">
-        <img src="img/SUAV LOGO.png" />
+        <a href="#"> <img src="img/SUAV LOGO.png" /></a>
       </div>
       <div class="social-media">
-        <a href="https://www.instagram.com/instagram" target="_blank"
-          ><img src="img/instagram-128.png" class="insta"
-        /></a>
-        <a href="https://www.tiktok.com/@suav.sa?_t=ZS-8vWa0DgBdJq&_r=1" target="_blank"
-          ><img src="img/tiktok-square-color-icon.png"
-        /></a>
-        <a href="https://wa.me/966580081181" target="_blank"
-        ><img src="img/whatsapp-128.png" class="whatsapp"
-      /></a>
+        <ul class="social-links">
+          <li class="social-icon">
+            <a
+              href="https://www.instagram.com/suav.co15?igsh=MWs0azMzbHMzbnN3aw%3D%3D&utm_source=qr"
+              target="_blank"
+            >
+              <img src="img/instagram.png" />
+            </a>
+          </li>
+          <li class="social-icon">
+            <a
+              href="https://www.tiktok.com/@suav.sa?_t=ZS-8vWa0DgBdJq&_r=1"
+              target="_blank"
+            >
+              <img src="img/tiktok.png" />
+            </a>
+          </li>
+          <li class="social-icon">
+            <a href="https://wa.me/966580081181" target="_blank">
+              <img src="img/whatsapp.png" />
+            </a>
+          </li>
+        </ul>
       </div>
 
       <p>Copyright © 2025 SUAV All rights reserved.</p>
     </footer>
-
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-    <script src="script.js"></script>
+    <script src="./script.js"></script>
   </body>
 </html>
