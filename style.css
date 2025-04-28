@@ -134,56 +134,53 @@ body {
   display: flex;
   justify-content: space-between;
   padding: 3rem;
-  /* background-color: #f3f3f3; */
   background-color: #f5ecdf;
   border: solid 3px white;
   text-align: right;
-  /* border-radius: 1.2rem; */
-  transition: transform 0.8s ease, opacity 0.8s ease;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
+  transition: transform 0.5s ease, opacity 0.5s ease;
   opacity: 0;
   visibility: hidden;
   margin: 0 auto;
+  will-change: transform, opacity;
 }
 
 .vision.active {
   opacity: 1;
   visibility: visible;
-  transform: translateZ(0) translateY(0);
+  transform: translateY(0);
 }
 
 .vision:not(.active) {
-  transform: translateZ(-100px) translateY(50px);
+  transform: translateY(30px);
 }
 
 .vision-slide.slide-out {
-  animation: slideOut 0.8s forwards;
+  animation: slideOut 0.5s forwards;
 }
 
 .vision-slide.slide-in {
-  animation: slideIn 0.8s forwards;
+  animation: slideIn 0.5s forwards;
 }
 
 @keyframes slideOut {
   0% {
     opacity: 1;
-    transform: translateZ(0) translateY(0);
+    transform: translateY(0);
   }
   100% {
     opacity: 0;
-    transform: translateZ(-100px) translateY(50px);
+    transform: translateY(30px);
   }
 }
 
 @keyframes slideIn {
   0% {
     opacity: 0;
-    transform: translateZ(-100px) translateY(-50px);
+    transform: translateY(-30px);
   }
   100% {
     opacity: 1;
-    transform: translateZ(0) translateY(0);
+    transform: translateY(0);
   }
 }
 
@@ -549,10 +546,75 @@ html {
   z-index: 9999;
 }
 
-/* Ensure AOS animations work well on mobile */
-@media (max-width: 768px) {
-  [data-aos] {
-    transition-duration: 600ms !important;
+/* High-performance animations for work section */
+.work-img, .third-img {
+  opacity: 0;
+  transform: scale(0.95);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/* Animation classes with hardware acceleration - slightly slower */
+.custom-flip-left {
+  animation: customFlipLeft 1.2s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+.custom-flip-right {
+  animation: customFlipRight 1.2s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+.custom-flip-up {
+  animation: customFlipUp 1.2s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+.custom-flip-down {
+  animation: customFlipDown 1.2s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+/* Optimized keyframe animations */
+@keyframes customFlipLeft {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) rotateY(-30deg) translateX(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateY(0) translateX(0);
+  }
+}
+
+@keyframes customFlipRight {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) rotateY(30deg) translateX(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateY(0) translateX(0);
+  }
+}
+
+@keyframes customFlipUp {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(30deg) translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0) translateY(0);
+  }
+}
+
+@keyframes customFlipDown {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(-30deg) translateY(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0) translateY(0);
   }
 }
 

@@ -15,12 +15,12 @@ document.addEventListener("DOMContentLoaded", function () {
     scrollingEnabled: scrollingEnabled,
   });
 
-  // Initialize AOS
+  // We'll use our own custom animations instead of AOS
+  // But still initialize AOS for other elements
   AOS.init({
     duration: 800,
-    easing: "ease-out-cubic",
-    once: false,
-    mirror: true,
+    easing: "ease-out",
+    once: true
   });
 
   // Make sure all vision slides are hidden initially
@@ -52,12 +52,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 2000);
   }
 
-  // Function to show vision with animation
+  // Optimized function to show vision with animation
   function showVisionWithAnimation() {
     if (visionAnimationDone) return; // Prevent multiple animations
-
-    console.log("Showing first vision slide");
-
+    
     // Add a small delay to ensure hero section is visible first
     setTimeout(() => {
       if (visionSlides.length > 0) {
@@ -71,20 +69,16 @@ document.addEventListener("DOMContentLoaded", function () {
         // Enable scroll handling after first slide is shown
         setTimeout(() => {
           scrollingEnabled = true;
-          console.log("Scrolling enabled:", scrollingEnabled);
-        }, 1000);
+        }, 500);
       }
-    }, 500);
+    }, 300);
   }
 
-  // Function to show next vision slide
+  // Optimized function to show next vision slide
   function showNextVisionSlide() {
-    console.log("Attempting to show next slide, current:", currentVisionSlide);
-
     // If we're already at the last slide
     if (currentVisionSlide >= visionSlides.length - 1) {
       visionSlidesComplete = true;
-      console.log("All vision slides complete");
       return false; // No more slides to show
     }
 
@@ -98,32 +92,56 @@ document.addEventListener("DOMContentLoaded", function () {
     currentVisionSlide++;
     visionSlides[currentVisionSlide].classList.add("active");
 
-    console.log("Showed slide:", currentVisionSlide);
-
-    // Re-enable scrolling after a delay
+    // Re-enable scrolling after a shorter delay
     setTimeout(() => {
       scrollingEnabled = true;
-      console.log("Scrolling re-enabled after transition");
-    }, 1000); // 1 second cooldown between slide transitions
+    }, 500); // Reduced cooldown for smoother experience
 
     return true; // Successfully showed next slide
   }
 
-  // Function to animate work images with flip effect
+  // High-performance animation function with requestAnimationFrame
   function animateWorkImages() {
-    // Reset all images first
-    workImages.forEach((img) => {
-      img.classList.remove("flip-in");
-    });
-
-    // Trigger reflow to ensure animations restart
-    void ourWorkSection.offsetWidth;
-
-    // Add animation with delay
-    workImages.forEach((img, index) => {
-      setTimeout(() => {
-        img.classList.add("flip-in");
-      }, index * 200); // Stagger the animations
+    // Pre-cache DOM elements for better performance
+    const elements = {
+      first: document.querySelector('.first-img'),
+      second: document.querySelector('.second-img'),
+      third: document.querySelector('.third-img'),
+      fourth: document.querySelector('.img-right-side')
+    };
+    
+    // Animation sequence with optimal timing
+    const animations = [
+      { element: elements.first, type: 'custom-flip-left', delay: 0 },
+      { element: elements.second, type: 'custom-flip-right', delay: 150 },
+      { element: elements.third, type: 'custom-flip-up', delay: 250 },
+      { element: elements.fourth, type: 'custom-flip-down', delay: 350 }
+    ];
+    
+    // Reset all animations first (in a single frame)
+    requestAnimationFrame(() => {
+      animations.forEach(item => {
+        if (item.element) {
+          // Remove animation classes
+          item.element.classList.remove(item.type);
+          // Ensure element is visible in the DOM but not yet animated
+          item.element.style.opacity = '0';
+        }
+      });
+      
+      // Force reflow once for all elements
+      void document.body.offsetHeight;
+      
+      // Apply animations with precise timing
+      animations.forEach(item => {
+        if (item.element) {
+          setTimeout(() => {
+            requestAnimationFrame(() => {
+              item.element.classList.add(item.type);
+            });
+          }, item.delay);
+        }
+      });
     });
   }
 
@@ -137,53 +155,113 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-  // Simplified wheel event handler
-  window.addEventListener(
-    "wheel",
-    function (e) {
-      if (!scrollingEnabled) return;
-
-      if (!visionSlidesComplete && e.deltaY > 0) {
-        e.preventDefault();
+  // Improved scroll handling with better performance
+  let lastScrollTime = 0;
+  const scrollCooldown = 800; // ms between scroll actions
+  
+  window.addEventListener("scroll", function() {
+    // Only handle scroll events if we're still showing vision slides
+    if (!visionSlidesComplete && scrollingEnabled) {
+      const now = Date.now();
+      
+      // Check if enough time has passed since last scroll action
+      if (now - lastScrollTime > scrollCooldown) {
+        lastScrollTime = now;
         showNextVisionSlide();
       }
-    },
-    { passive: false }
-  );
-
-  // Prevent default scrolling while showing slides
-  window.addEventListener("scroll", function () {
-    if (!visionSlidesComplete) {
-      window.scrollTo(0, 0);
     }
+  }, { passive: true });
+  
+  // We no longer prevent default scrolling behavior
+  // This allows for smoother native scrolling
+
+  // Variables to track animation state
+  let animationsAlreadyPlayed = false;
+  let isOutsideViewport = false;
+  
+  // Optimized scroll detection for desktop devices
+  if (window.innerWidth > 768) {
+    // Use Intersection Observer instead of scroll events for better performance
+    const animationObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        // When section enters viewport
+        if (entry.isIntersecting && isOutsideViewport) {
+          // Schedule animation in next frame for smoothness
+          requestAnimationFrame(() => {
+            animateWorkImages();
+          });
+          isOutsideViewport = false;
+        } 
+        // When section leaves viewport
+        else if (!entry.isIntersecting && !isOutsideViewport) {
+          isOutsideViewport = true;
+        }
+      });
+    }, {
+      // Slightly trigger before fully visible for smoother perception
+      threshold: 0.15,
+      rootMargin: '0px'
+    });
+    
+    // Start observing the work section
+    animationObserver.observe(ourWorkSection);
+  } else {
+    // For mobile: Only play animations once after loader
+    animationsAlreadyPlayed = false;
+  }
+  
+  // Directly trigger animations after loader completes
+  function triggerWorkAnimations() {
+    console.log('Triggering work animations directly');
+    // Force animations to play regardless of viewport
+    animateWorkImages();
+    workSectionVisible = true;
+    
+    // On mobile, mark as played to prevent repeat on scroll
+    if (window.innerWidth <= 768) {
+      animationsAlreadyPlayed = true;
+    }
+  }
+  
+  // Handle loader completion
+  if (loaderVideo) {
+    // When loader video ends
+    loaderVideo.addEventListener("ended", function() {
+      console.log('Loader video ended, triggering animations after delay');
+      // Wait a moment after video ends before triggering animations
+      setTimeout(triggerWorkAnimations, 100);
+    });
+  } else {
+    // Fallback if no video
+    console.log('No loader video found, using timeout');
+    setTimeout(triggerWorkAnimations, 8000);
+  }
+  
+  // Also trigger on load for mobile devices that might not play the video
+  window.addEventListener('load', function() {
+    console.log('Window loaded, setting animation trigger');
+    // If animations haven't been triggered by video end, do it after a delay
+    setTimeout(function() {
+      if (!workSectionVisible) {
+        console.log('Triggering animations from load event');
+        triggerWorkAnimations();
+      }
+    }, 7500); // Slightly longer than video length to avoid double triggering
   });
 
-  // Check for animations on scroll - only for work section
-  window.addEventListener(
-    "scroll",
-    debounce(function () {
-      console.log("Scroll event for work section");
-      // Check if work section is in viewport
-      const workSectionVisible = isInViewport(ourWorkSection);
-
-      // If section visibility changed from invisible to visible
-      if (workSectionVisible && !isWorkSectionVisible) {
-        animateWorkImages();
-      }
-
-      // Update section visibility state
-      isWorkSectionVisible = workSectionVisible;
-    }, 50)
-  );
-
-  // Debounce function to limit scroll events
-  function debounce(func, wait) {
-    let timeout;
-    return function () {
-      const context = this;
+  // High-performance throttle function (better than debounce for animations)
+  function throttle(func, limit) {
+    let inThrottle;
+    return function() {
       const args = arguments;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(context, args), wait);
+      const context = this;
+      if (!inThrottle) {
+        func.apply(context, args);
+        inThrottle = true;
+        requestAnimationFrame(() => {
+          inThrottle = false;
+        });
+      }
     };
   }
 
