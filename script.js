@@ -311,6 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const sunIcon = document.querySelector(".sun-icon");
     const moonIcon = document.querySelector(".moon-icon");
     const logoImg = document.querySelector(".logo a img");
+    const decorationImg = document.querySelector(".deco-img");
 
     // Update icon visibility based on current theme
     sunIcon.style.display = isDark ? "none" : "block";
@@ -319,6 +320,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // Update logo image based on theme
     if (logoImg) {
       logoImg.src = isDark ? "img/SUAV LOGO2.png" : "img/SUAV LOGO.png";
+    }
+
+    // Update decoration image based on theme
+    if (decorationImg) {
+      decorationImg.src = isDark ? "img/decoration2.png" : "img/decoration.png";
     }
   }
 });
