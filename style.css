@@ -87,6 +87,16 @@ body {
   width: 30%;
 }
 
+@media (max-width: 768px) {
+  .logo {
+    background-color: #ffffff;
+  }
+  
+  .darkTheme .logo {
+    background-color: #f5ecdf;
+  }
+}
+
 /**********************************/
 /*********Hero Section********/
 /**********************************/
@@ -674,6 +684,12 @@ html {
   align-items: center;
   justify-content: center;
 }
+
+/* @media (max-width: 768px) {
+  #themeToggle {
+    top: 10px !important;
+  }
+} */
 
 #themeToggle:hover {
   background-color: #940d47;

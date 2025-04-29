@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function showVisionWithAnimation() {
     if (visionAnimationDone) return; // Prevent multiple animations
     
-    // Add a small delay to ensure hero section is visible first
+    // Add a smaller delay to ensure hero section is visible first
     setTimeout(() => {
       if (visionSlides.length > 0) {
         // Add the active class to make it visible
@@ -69,9 +69,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // Enable scroll handling after first slide is shown
         setTimeout(() => {
           scrollingEnabled = true;
-        }, 500);
+        }, 300); // Reduced from 500
       }
-    }, 300);
+    }, 200); // Reduced from 300
   }
 
   // Optimized function to show next vision slide
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Re-enable scrolling after a shorter delay
     setTimeout(() => {
       scrollingEnabled = true;
-    }, 500); // Reduced cooldown for smoother experience
+    }, 300); // Reduced from 500
 
     return true; // Successfully showed next slide
   }
@@ -113,9 +113,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Animation sequence with optimal timing
     const animations = [
       { element: elements.first, type: 'custom-flip-left', delay: 0 },
-      { element: elements.second, type: 'custom-flip-right', delay: 150 },
-      { element: elements.third, type: 'custom-flip-up', delay: 250 },
-      { element: elements.fourth, type: 'custom-flip-down', delay: 350 }
+      { element: elements.second, type: 'custom-flip-right', delay: 50 }, // Reduced from 100
+      { element: elements.third, type: 'custom-flip-up', delay: 100 }, // Reduced from 200
+      { element: elements.fourth, type: 'custom-flip-down', delay: 150 } // Reduced from 300
     ];
     
     // Reset all animations first (in a single frame)
@@ -229,12 +229,12 @@ document.addEventListener("DOMContentLoaded", function () {
     loaderVideo.addEventListener("ended", function() {
       console.log('Loader video ended, triggering animations after delay');
       // Wait a moment after video ends before triggering animations
-      setTimeout(triggerWorkAnimations, 100);
+      setTimeout(triggerWorkAnimations, 50); // Reduced from 100
     });
   } else {
     // Fallback if no video
     console.log('No loader video found, using timeout');
-    setTimeout(triggerWorkAnimations, 8000);
+    setTimeout(triggerWorkAnimations, 4000); // Reduced from 8000
   }
   
   // Also trigger on load for mobile devices that might not play the video
@@ -246,7 +246,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log('Triggering animations from load event');
         triggerWorkAnimations();
       }
-    }, 7500); // Slightly longer than video length to avoid double triggering
+    }, 50); // Reduced from 100
   });
 
   // High-performance throttle function (better than debounce for animations)
