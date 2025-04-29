@@ -732,12 +732,12 @@ html {
 }
 
 .darkTheme .footer {
-  border-top: 1px solid #a2094b;
-  background-color: #ffffff;
+  border-top: 1px solid #f5ecdf;
+  background-color: #7a0034;
 }
 
 .darkTheme .footer p {
-  color: #7a0034;
+  color: #f5ecdf;
 }
 
 .darkTheme .footer-logo img {
