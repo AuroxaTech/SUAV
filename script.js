@@ -319,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Update logo image based on theme
     if (logoImg) {
-      logoImg.src = isDark ? "img/SUAV LOGO2.png" : "img/SUAV LOGO.png";
+      logoImg.src = isDark ? "img/SUAV LOGO2.png" : "img/SUAV LOGO3.png";
     }
 
     // Update decoration image based on theme
