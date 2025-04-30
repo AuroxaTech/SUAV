@@ -3,27 +3,29 @@ document.addEventListener("DOMContentLoaded", function () {
   const workImages = document.querySelectorAll(".work-img");
   const ourWorkSection = document.querySelector(".our-work");
   const loaderVideo = document.querySelector(".loader-video");
-
+  const visionContainer = document.querySelector(".vision-container");
+  
   let isWorkSectionVisible = false;
   let visionAnimationDone = false;
   let currentVisionSlide = 0;
   let visionSlidesComplete = false;
   let scrollingEnabled = false;
+  let isScrollLocked = true; // New variable to track scroll lock state
 
   console.log("Script initialized", {
     visionSlides: visionSlides.length,
     scrollingEnabled: scrollingEnabled,
+    isScrollLocked: isScrollLocked
   });
 
-  // We'll use our own custom animations instead of AOS
-  // But still initialize AOS for other elements
+  // Initialize AOS for other elements
   AOS.init({
     duration: 800,
     easing: "ease-out",
     once: true
   });
 
-  // Make sure all vision slides are hidden initially
+  // Make sure all vision slides are hidden initially except the first one
   visionSlides.forEach((slide, index) => {
     slide.classList.remove("active");
     console.log(`Vision slide ${index} initialized`);
@@ -52,55 +54,191 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 2000);
   }
 
-  // Optimized function to show vision with animation
+  // Function to show vision with animation
   function showVisionWithAnimation() {
-    if (visionAnimationDone) return; // Prevent multiple animations
+    if (visionAnimationDone) return;
     
-    // Add a smaller delay to ensure hero section is visible first
     setTimeout(() => {
       if (visionSlides.length > 0) {
-        // Add the active class to make it visible
+        // Add the active class to make first slide visible
         visionSlides[0].classList.add("active");
         currentVisionSlide = 0;
 
-        // Mark animation as done
+        // Mark animation as started
         visionAnimationDone = true;
 
         // Enable scroll handling after first slide is shown
         setTimeout(() => {
           scrollingEnabled = true;
-        }, 300); // Reduced from 500
+          
+          // Apply scroll lock
+          enableScrollLock();
+        }, 300);
       }
-    }, 200); // Reduced from 300
+    }, 200);
   }
 
-  // Optimized function to show next vision slide
+  // Function to show next vision slide
   function showNextVisionSlide() {
     // If we're already at the last slide
     if (currentVisionSlide >= visionSlides.length - 1) {
+      // We've seen all slides, unlock scrolling
       visionSlidesComplete = true;
-      return false; // No more slides to show
+      disableScrollLock();
+      return false;
     }
 
     // Temporarily disable scrolling to prevent multiple rapid transitions
     scrollingEnabled = false;
 
-    // Hide current slide
+    // Hide current slide with animation
     visionSlides[currentVisionSlide].classList.remove("active");
 
-    // Show next slide
+    // Show next slide with animation
     currentVisionSlide++;
     visionSlides[currentVisionSlide].classList.add("active");
 
-    // Re-enable scrolling after a shorter delay
+    // Re-enable scroll detection after transition completes
     setTimeout(() => {
       scrollingEnabled = true;
-    }, 300); // Reduced from 500
+    }, 300);
 
     return true; // Successfully showed next slide
   }
 
-  // High-performance animation function with requestAnimationFrame
+  // Enable scroll lock
+  function enableScrollLock() {
+    isScrollLocked = true;
+    
+    // Store the current scroll position
+    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    
+    // Get position of vision container
+    const visionRect = visionContainer.getBoundingClientRect();
+    const visionPosition = scrollPosition + visionRect.top;
+    
+    // Apply fixed position to body to prevent scrolling
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollPosition}px`;
+    document.body.style.width = '100%';
+    
+    console.log("Scroll lock enabled");
+  }
+
+  // Disable scroll lock
+  function disableScrollLock() {
+    if (!isScrollLocked) return;
+    
+    isScrollLocked = false;
+    
+    // Get the scroll position from body's top property
+    const scrollY = document.body.style.top;
+    
+    // Remove fixed positioning
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    
+    // Restore scroll position
+    window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    
+    console.log("Scroll lock disabled - all slides viewed");
+  }
+
+  // Handle wheel events while locked
+  function handleWheel(e) {
+    if (!isScrollLocked || !scrollingEnabled) return;
+    
+    // Determine scroll direction
+    const direction = e.deltaY > 0 ? 'down' : 'up';
+    
+    if (direction === 'down') {
+      // Scroll down: show next slide
+      showNextVisionSlide();
+    } else if (direction === 'up' && currentVisionSlide > 0) {
+      // Scroll up: show previous slide (optional)
+      // This allows users to go back to previous slides
+      scrollingEnabled = false;
+      visionSlides[currentVisionSlide].classList.remove("active");
+      currentVisionSlide--;
+      visionSlides[currentVisionSlide].classList.add("active");
+      
+      setTimeout(() => {
+        scrollingEnabled = true;
+      }, 300);
+    }
+    
+    // Prevent default scroll behavior
+    e.preventDefault();
+  }
+
+  // Handle touch events for mobile
+  let touchStartY = 0;
+  
+  function handleTouchStart(e) {
+    if (!isScrollLocked) return;
+    touchStartY = e.touches[0].clientY;
+  }
+  
+  function handleTouchMove(e) {
+    if (!isScrollLocked || !scrollingEnabled) return;
+    
+    const touchY = e.touches[0].clientY;
+    const diff = touchStartY - touchY;
+    
+    // Minimum swipe distance to trigger slide change
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        // Swipe up - show next slide
+        showNextVisionSlide();
+      } else if (diff < 0 && currentVisionSlide > 0) {
+        // Swipe down - show previous slide (optional)
+        scrollingEnabled = false;
+        visionSlides[currentVisionSlide].classList.remove("active");
+        currentVisionSlide--;
+        visionSlides[currentVisionSlide].classList.add("active");
+        
+        setTimeout(() => {
+          scrollingEnabled = true;
+        }, 300);
+      }
+      
+      // Update starting position for next move
+      touchStartY = touchY;
+      
+      // Prevent default behavior
+      e.preventDefault();
+    }
+  }
+
+  // Set up event listeners for wheel and touch events
+  window.addEventListener('wheel', handleWheel, { passive: false });
+  window.addEventListener('touchstart', handleTouchStart, { passive: true });
+  window.addEventListener('touchmove', handleTouchMove, { passive: false });
+  
+  // Add keyboard navigation
+  window.addEventListener('keydown', function(e) {
+    if (!isScrollLocked || !scrollingEnabled) return;
+    
+    if (e.key === 'ArrowDown' || e.key === 'Space') {
+      showNextVisionSlide();
+      e.preventDefault();
+    } else if (e.key === 'ArrowUp' && currentVisionSlide > 0) {
+      scrollingEnabled = false;
+      visionSlides[currentVisionSlide].classList.remove("active");
+      currentVisionSlide--;
+      visionSlides[currentVisionSlide].classList.add("active");
+      
+      setTimeout(() => {
+        scrollingEnabled = true;
+      }, 300);
+      e.preventDefault();
+    }
+  });
+
+  // High-performance animation function for work images (keeping original functionality)
   function animateWorkImages() {
     // Pre-cache DOM elements for better performance
     const elements = {
@@ -113,9 +251,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Animation sequence with optimal timing
     const animations = [
       { element: elements.first, type: 'custom-flip-left', delay: 0 },
-      { element: elements.second, type: 'custom-flip-right', delay: 50 }, // Reduced from 100
-      { element: elements.third, type: 'custom-flip-up', delay: 100 }, // Reduced from 200
-      { element: elements.fourth, type: 'custom-flip-down', delay: 150 } // Reduced from 300
+      { element: elements.second, type: 'custom-flip-right', delay: 50 }, 
+      { element: elements.third, type: 'custom-flip-up', delay: 100 }, 
+      { element: elements.fourth, type: 'custom-flip-down', delay: 150 }
     ];
     
     // Reset all animations first (in a single frame)
@@ -144,36 +282,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
   }
-
-  // Check if element is in viewport
-  function isInViewport(element) {
-    const rect = element.getBoundingClientRect();
-    return (
-      rect.top <=
-        (window.innerHeight || document.documentElement.clientHeight) * 0.8 &&
-      rect.bottom >= 0
-    );
-  }
-
-  // Improved scroll handling with better performance
-  let lastScrollTime = 0;
-  const scrollCooldown = 800; // ms between scroll actions
-  
-  window.addEventListener("scroll", function() {
-    // Only handle scroll events if we're still showing vision slides
-    if (!visionSlidesComplete && scrollingEnabled) {
-      const now = Date.now();
-      
-      // Check if enough time has passed since last scroll action
-      if (now - lastScrollTime > scrollCooldown) {
-        lastScrollTime = now;
-        showNextVisionSlide();
-      }
-    }
-  }, { passive: true });
-  
-  // We no longer prevent default scrolling behavior
-  // This allows for smoother native scrolling
 
   // Variables to track animation state
   let animationsAlreadyPlayed = false;
@@ -204,70 +312,56 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     
     // Start observing the work section
-    animationObserver.observe(ourWorkSection);
-  } else {
-    // For mobile: Only play animations once after loader
-    animationsAlreadyPlayed = false;
-  }
-  
-  // Directly trigger animations after loader completes
-  function triggerWorkAnimations() {
-    console.log('Triggering work animations directly');
-    // Force animations to play regardless of viewport
-    animateWorkImages();
-    workSectionVisible = true;
-    
-    // On mobile, mark as played to prevent repeat on scroll
-    if (window.innerWidth <= 768) {
-      animationsAlreadyPlayed = true;
+    if (ourWorkSection) {
+      animationObserver.observe(ourWorkSection);
     }
   }
-  
-  // Handle loader completion
-  if (loaderVideo) {
-    // When loader video ends
-    loaderVideo.addEventListener("ended", function() {
-      console.log('Loader video ended, triggering animations after delay');
-      // Wait a moment after video ends before triggering animations
-      setTimeout(triggerWorkAnimations, 50); // Reduced from 100
-    });
-  } else {
-    // Fallback if no video
-    console.log('No loader video found, using timeout');
-    setTimeout(triggerWorkAnimations, 4000); // Reduced from 8000
-  }
-  
-  // Also trigger on load for mobile devices that might not play the video
-  window.addEventListener('load', function() {
-    console.log('Window loaded, setting animation trigger');
-    // If animations haven't been triggered by video end, do it after a delay
-    setTimeout(function() {
-      if (!workSectionVisible) {
-        console.log('Triggering animations from load event');
-        triggerWorkAnimations();
-      }
-    }, 50); // Reduced from 100
-  });
 
-  // High-performance throttle function (better than debounce for animations)
-  function throttle(func, limit) {
-    let inThrottle;
-    return function() {
-      const args = arguments;
-      const context = this;
-      if (!inThrottle) {
-        func.apply(context, args);
-        inThrottle = true;
-        requestAnimationFrame(() => {
-          inThrottle = false;
-        });
-      }
+  // Add visual indicator for scroll lock (optional)
+  function createScrollIndicator() {
+    const indicator = document.createElement('div');
+    indicator.className = 'scroll-indicator';
+    indicator.innerHTML = `
+      <div class="indicator-dots">
+        ${Array.from(visionSlides).map((_, i) => 
+          `<span class="indicator-dot ${i === 0 ? 'active' : ''}"></span>`
+        ).join('')}
+      </div>
+      <div class="indicator-arrow">
+        <svg width="20" height="12" viewBox="0 0 20 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 12L0 2L2 0L10 8L18 0L20 2L10 12Z" fill="#7a0034"/>
+        </svg>
+      </div>
+    `;
+    
+    document.querySelector('.vision-container').appendChild(indicator);
+    
+    // Update indicator when slides change
+    const updateIndicator = () => {
+      const dots = indicator.querySelectorAll('.indicator-dot');
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentVisionSlide);
+      });
+      
+      // Hide arrow on last slide
+      const arrow = indicator.querySelector('.indicator-arrow');
+      arrow.style.opacity = currentVisionSlide >= visionSlides.length - 1 ? '0' : '1';
     };
+    
+    // Add observer to watch for slide changes
+    const slideObserver = new MutationObserver(() => {
+      updateIndicator();
+    });
+    
+    visionSlides.forEach(slide => {
+      slideObserver.observe(slide, { attributes: true });
+    });
   }
+  
+  // Create scroll indicator
+  createScrollIndicator();
 
-  console.log("Script setup complete");
-
-  // Theme toggle functionality
+  // Theme toggle functionality (keeping original functionality)
   const themeToggle = document.getElementById("themeToggle");
 
   // Check for saved theme preference or respect OS preference
@@ -290,23 +384,27 @@ document.addEventListener("DOMContentLoaded", function () {
   updateThemeToggle();
 
   // Add click event to toggle theme
-  themeToggle.addEventListener("click", function () {
-    // Toggle darkTheme class on body
-    document.body.classList.toggle("darkTheme");
-
-    // Save user preference
-    if (document.body.classList.contains("darkTheme")) {
-      localStorage.setItem("theme", "dark");
-    } else {
-      localStorage.setItem("theme", "light");
-    }
-
-    // Update button appearance
-    updateThemeToggle();
-  });
+  if (themeToggle) {
+    themeToggle.addEventListener("click", function () {
+      // Toggle darkTheme class on body
+      document.body.classList.toggle("darkTheme");
+  
+      // Save user preference
+      if (document.body.classList.contains("darkTheme")) {
+        localStorage.setItem("theme", "dark");
+      } else {
+        localStorage.setItem("theme", "light");
+      }
+  
+      // Update button appearance
+      updateThemeToggle();
+    });
+  }
 
   // Function to update toggle button appearance
   function updateThemeToggle() {
+    if (!themeToggle) return;
+    
     const isDark = document.body.classList.contains("darkTheme");
     const sunIcon = document.querySelector(".sun-icon");
     const moonIcon = document.querySelector(".moon-icon");
@@ -314,17 +412,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const decorationImg = document.querySelector(".deco-img");
 
     // Update icon visibility based on current theme
-    sunIcon.style.display = isDark ? "none" : "block";
-    moonIcon.style.display = isDark ? "block" : "none";
+    if (sunIcon && moonIcon) {
+      sunIcon.style.display = isDark ? "none" : "block";
+      moonIcon.style.display = isDark ? "block" : "none";
+    }
     
     // Update logo image based on theme
     if (logoImg) {
-      logoImg.src = isDark ? "img/SUAV LOGO2.png" : "img/SUAV LOGO3.png";
+      logoImg.src = isDark ? "img/LOGO.png" : "img/SUAV LOGO3.png";
     }
 
     // Update decoration image based on theme
     if (decorationImg) {
-      decorationImg.src = isDark ? "img/decoration2.png" : "img/decoration.png";
+      decorationImg.src = isDark ? "img/decoration2.png" : "img/decoration3.png";
     }
   }
+
+  console.log("Script setup complete with scroll lock");
 });
