@@ -12,10 +12,14 @@ document.addEventListener("DOMContentLoaded", function () {
   let scrollingEnabled = false;
   let isScrollLocked = true; // Track scroll lock state
   let workImagesAnimated = false; // Track if work images have been animated
-  const isMobile = window.innerWidth <= 768; // Detect if device is mobile
 
-  // Force the mobile animation pathway for testing
+  // Improved mobile detection
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+  // Force mobile animation pathway for specific browsers or devices
   console.log("Device detected as: " + (isMobile ? "MOBILE" : "DESKTOP"));
+  console.log("User Agent: " + navigator.userAgent);
+  console.log("Window Width: " + window.innerWidth);
 
   console.log("Script initialized", {
     visionSlides: visionSlides.length,
@@ -32,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
     once: true, // Important: only animate once
     disable: function() {
       // Disable AOS on mobile and also for our work images
-      return window.innerWidth <= 768 || 
+      return isMobile || 
         document.querySelectorAll('.work-img, .third-img').length > 0;
     }
   });
@@ -58,12 +62,12 @@ document.addEventListener("DOMContentLoaded", function () {
       showVisionWithAnimation();
       
       // On mobile, animate work images immediately after loader completes
-      if (isMobile) {
-        console.log("Mobile detected - triggering immediate animation after loader");
-        setTimeout(() => {
-          animateWorkImages();
-        }, 300);
-      }
+      // if (isMobile) {
+      //   console.log("Mobile detected - triggering immediate animation after loader");
+      //   setTimeout(() => {
+      //     animateWorkImages();
+      //   }, 300);
+      // }
       // On desktop, we'll use IntersectionObserver instead
     });
 
@@ -115,8 +119,14 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => {
           scrollingEnabled = true;
           
-          // Apply scroll lock
-          enableScrollLock();
+          // Apply scroll lock only on desktop - disable on mobile
+          if (!isMobile) {
+            enableScrollLock();
+          } else {
+            // On mobile, we don't want to lock scrolling
+            isScrollLocked = false;
+            console.log("Skipping scroll lock on mobile");
+          }
         }, 300);
       }
     }, 200);
@@ -150,8 +160,10 @@ document.addEventListener("DOMContentLoaded", function () {
     return true; // Successfully showed next slide
   }
 
-  // Enable scroll lock
+  // Enable scroll lock - only for desktop
   function enableScrollLock() {
+    if (isMobile) return; // Skip on mobile devices
+    
     isScrollLocked = true;
     
     // Store the current scroll position
@@ -191,9 +203,9 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Scroll lock disabled - all slides viewed");
   }
 
-  // Handle wheel events while locked
+  // Handle wheel events while locked - desktop only
   function handleWheel(e) {
-    if (!isScrollLocked || !scrollingEnabled) return;
+    if (isMobile || !isScrollLocked || !scrollingEnabled) return;
     
     // Determine scroll direction
     const direction = e.deltaY > 0 ? 'down' : 'up';
@@ -218,15 +230,19 @@ document.addEventListener("DOMContentLoaded", function () {
     e.preventDefault();
   }
 
-  // Handle touch events for mobile
+  // Handle touch events for mobile - simpler approach for mobile
   let touchStartY = 0;
   
   function handleTouchStart(e) {
-    if (!isScrollLocked) return;
+    // We'll track touch starts even on mobile without scroll lock
     touchStartY = e.touches[0].clientY;
   }
   
   function handleTouchMove(e) {
+    // For mobile, we want normal scrolling behavior
+    if (isMobile) return;
+    
+    // This code will only run on desktop with touch
     if (!isScrollLocked || !scrollingEnabled) return;
     
     const touchY = e.touches[0].clientY;
@@ -252,19 +268,43 @@ document.addEventListener("DOMContentLoaded", function () {
       // Update starting position for next move
       touchStartY = touchY;
       
-      // Prevent default behavior
+      // Prevent default behavior on desktop only
       e.preventDefault();
     }
   }
 
-  // Set up event listeners for wheel and touch events
-  window.addEventListener('wheel', handleWheel, { passive: false });
-  window.addEventListener('touchstart', handleTouchStart, { passive: true });
-  window.addEventListener('touchmove', handleTouchMove, { passive: false });
+  // Set up event listeners - but handle mobile/desktop differently
+  if (!isMobile) {
+    // Only add these on desktop
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+  } else {
+    // On mobile, we want simple touch navigation for vision slides
+    document.addEventListener('swiped-up', function() {
+      showNextVisionSlide();
+    });
+    
+    document.addEventListener('swiped-down', function() {
+      if (currentVisionSlide > 0) {
+        scrollingEnabled = false;
+        visionSlides[currentVisionSlide].classList.remove("active");
+        currentVisionSlide--;
+        visionSlides[currentVisionSlide].classList.add("active");
+        
+        setTimeout(() => {
+          scrollingEnabled = true;
+        }, 300);
+      }
+    });
+  }
   
-  // Add keyboard navigation
+  // Add keyboard navigation - works on both mobile and desktop
   window.addEventListener('keydown', function(e) {
-    if (!isScrollLocked || !scrollingEnabled) return;
+    if (!scrollingEnabled) return;
+    
+    // On mobile, we don't need scroll lock check
+    if (!isMobile && !isScrollLocked) return;
     
     if (e.key === 'ArrowDown' || e.key === ' ') {
       showNextVisionSlide();
@@ -285,7 +325,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Variable to track whether the our-work section has been observed
   let ourWorkObserved = false;
 
-  // Set up IntersectionObserver for "our-work" section
+  // Set up IntersectionObserver for "our-work" section on desktop only
   if (ourWorkSection && !isMobile) {
     const workSectionObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -314,7 +354,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // For mobile, we'll handle the animation differently
     console.log("Mobile device detected - skipping IntersectionObserver setup");
     
-    // For mobile, schedule immediate animation after a short delay
+    // For mobile, trigger animation immediately
     setTimeout(() => {
       console.log("Running immediate animation for mobile");
       animateWorkImages();
@@ -346,7 +386,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Work images animation reset for re-animation");
   }
 
-  // Improved work images animation function that works on all devices
+  // Improved work images animation function that works better on mobile
   function animateWorkImages() {
     // For desktop, only animate if section is visible and not already animated
     if (!isMobile && workImagesAnimated) {
@@ -366,11 +406,12 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     
     // Define animations with mobile-friendly timing
+    // Use longer delays on mobile for smoother performance
     const animations = [
       { element: elements.first, type: 'custom-flip-left', delay: 0 },
-      { element: elements.second, type: 'custom-flip-right', delay: isMobile ? 300 : 50 },
-      { element: elements.third, type: 'custom-flip-up', delay: isMobile ? 600 : 100 },
-      { element: elements.fourth, type: 'custom-flip-down', delay: isMobile ? 900 : 150 }
+      { element: elements.second, type: 'custom-flip-right', delay: isMobile ? 50 : 50 },
+      { element: elements.third, type: 'custom-flip-up', delay: isMobile ? 100 : 100 },
+      { element: elements.fourth, type: 'custom-flip-down', delay: isMobile ? 150 : 150 }
     ];
     
     // Ensure all work images are visible before animation
@@ -405,10 +446,29 @@ document.addEventListener("DOMContentLoaded", function () {
       const styleSheet = document.createElement('style');
       styleSheet.id = 'custom-animation-styles';
       styleSheet.textContent = `
+        /* Mobile-specific optimizations */
+        @media (max-width: 768px) {
+          .vision-container {
+            /* Better performance on mobile */
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+          }
+          
+          /* Optimize animations for mobile */
+          .custom-flip-left, .custom-flip-right, .custom-flip-up, .custom-flip-down {
+            animation-duration: 1s; /* Slightly longer for mobile */
+          }
+        }
+        
         .custom-flip-left, .custom-flip-right, .custom-flip-up, .custom-flip-down {
           animation-duration: 0.8s;
           animation-fill-mode: both;
           opacity: 0;
+          /* Hardware acceleration */
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
         
         .custom-flip-left {
@@ -479,13 +539,56 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       `;
       document.head.appendChild(styleSheet);
+      
+      // Add touch swipe detection for mobile devices
+      if (isMobile) {
+        const swipeScript = document.createElement('script');
+        swipeScript.textContent = `
+          // Swipe detection
+          (function() {
+            let touchstartX = 0;
+            let touchstartY = 0;
+            let touchendX = 0;
+            let touchendY = 0;
+            
+            const threshold = 50; // minimum distance for a swipe
+            
+            document.addEventListener('touchstart', function(event) {
+              touchstartX = event.changedTouches[0].screenX;
+              touchstartY = event.changedTouches[0].screenY;
+            }, false);
+            
+            document.addEventListener('touchend', function(event) {
+              touchendX = event.changedTouches[0].screenX;
+              touchendY = event.changedTouches[0].screenY;
+              handleGesture();
+            }, false);
+            
+            function handleGesture() {
+              const deltaX = touchendX - touchstartX;
+              const deltaY = touchendY - touchstartY;
+              
+              if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > threshold) {
+                if (deltaY < 0) {
+                  const event = new Event('swiped-up');
+                  document.dispatchEvent(event);
+                } else {
+                  const event = new Event('swiped-down');
+                  document.dispatchEvent(event);
+                }
+              }
+            }
+          })();
+        `;
+        document.head.appendChild(swipeScript);
+      }
     }
   }
   
   // Add custom animation styles
   addCustomAnimationStyles();
 
-  // Add visual indicator for scroll lock (optional)
+  // Add visual indicator for scroll lock (optional) - with mobile optimizations
   function createScrollIndicator() {
     if (!visionContainer) return;
     
@@ -497,13 +600,18 @@ document.addEventListener("DOMContentLoaded", function () {
     
     const indicator = document.createElement('div');
     indicator.className = 'scroll-indicator';
+    
+    // Add mobile class if needed
+    if (isMobile) {
+      indicator.classList.add('mobile');
+    }
+    
     indicator.innerHTML = `
       <div class="indicator-dots">
         ${Array.from(visionSlides).map((_, i) => 
           `<span class="indicator-dot ${i === 0 ? 'active' : ''}"></span>`
         ).join('')}
       </div>
-      
     `;
     
     visionContainer.appendChild(indicator);
@@ -514,12 +622,6 @@ document.addEventListener("DOMContentLoaded", function () {
       dots.forEach((dot, i) => {
         dot.classList.toggle('active', i === currentVisionSlide);
       });
-      
-      // Hide arrow on last slide
-      const arrow = indicator.querySelector('.indicator-arrow');
-      if (arrow) {
-        arrow.style.opacity = currentVisionSlide >= visionSlides.length - 1 ? '0' : '1';
-      }
     };
     
     // Add observer to watch for slide changes
@@ -530,6 +632,33 @@ document.addEventListener("DOMContentLoaded", function () {
     visionSlides.forEach(slide => {
       slideObserver.observe(slide, { attributes: true });
     });
+    
+    // On mobile, make dots clickable
+    if (isMobile) {
+      const dots = indicator.querySelectorAll('.indicator-dot');
+      dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => {
+          // Don't process if animation is in progress
+          if (!scrollingEnabled) return;
+          
+          // Hide current slide
+          scrollingEnabled = false;
+          visionSlides[currentVisionSlide].classList.remove("active");
+          
+          // Show clicked slide
+          currentVisionSlide = i;
+          visionSlides[currentVisionSlide].classList.add("active");
+          
+          // Update dots
+          updateIndicator();
+          
+          // Re-enable scrolling after animation
+          setTimeout(() => {
+            scrollingEnabled = true;
+          }, 300);
+        });
+      });
+    }
   }
   
   // Create scroll indicator if vision container exists
@@ -604,5 +733,5 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  console.log("Script setup complete with scroll-triggered animations for desktop and immediate animations for mobile");
+  console.log("Script setup complete with optimizations for both desktop and mobile");
 });
