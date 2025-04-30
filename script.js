@@ -10,19 +10,38 @@ document.addEventListener("DOMContentLoaded", function () {
   let currentVisionSlide = 0;
   let visionSlidesComplete = false;
   let scrollingEnabled = false;
-  let isScrollLocked = true; // New variable to track scroll lock state
+  let isScrollLocked = true; // Track scroll lock state
+  let workImagesAnimated = false; // Track if work images have been animated
+  const isMobile = window.innerWidth <= 768; // Detect if device is mobile
+
+  // Force the mobile animation pathway for testing
+  console.log("Device detected as: " + (isMobile ? "MOBILE" : "DESKTOP"));
 
   console.log("Script initialized", {
     visionSlides: visionSlides.length,
+    workImages: workImages.length,
     scrollingEnabled: scrollingEnabled,
-    isScrollLocked: isScrollLocked
+    isScrollLocked: isScrollLocked,
+    isMobile: isMobile
   });
 
-  // Initialize AOS for other elements
+  // Initialize AOS for other elements, but disable for our work images
   AOS.init({
     duration: 800,
     easing: "ease-out",
-    once: true
+    once: true, // Important: only animate once
+    disable: function() {
+      // Disable AOS on mobile and also for our work images
+      return window.innerWidth <= 768 || 
+        document.querySelectorAll('.work-img, .third-img').length > 0;
+    }
+  });
+  
+  // Remove AOS attributes from our work images to prevent double animation
+  document.querySelectorAll('.work-img, .third-img').forEach(img => {
+    img.removeAttribute('data-aos');
+    img.removeAttribute('data-aos-duration');
+    img.removeAttribute('data-aos-delay');
   });
 
   // Make sure all vision slides are hidden initially except the first one
@@ -37,6 +56,15 @@ document.addEventListener("DOMContentLoaded", function () {
       document.body.classList.add("loaded");
       // Show first vision slide with animation after loader completes
       showVisionWithAnimation();
+      
+      // On mobile, animate work images immediately after loader completes
+      if (isMobile) {
+        console.log("Mobile detected - triggering immediate animation after loader");
+        setTimeout(() => {
+          animateWorkImages();
+        }, 300);
+      }
+      // On desktop, we'll use IntersectionObserver instead
     });
 
     // Fallback in case video doesn't load or has issues
@@ -44,6 +72,14 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!document.body.classList.contains("loaded")) {
         document.body.classList.add("loaded");
         showVisionWithAnimation();
+        
+        // On mobile, animate work images
+        if (isMobile) {
+          console.log("Mobile detected - triggering immediate animation (fallback)");
+          setTimeout(() => {
+            animateWorkImages();
+          }, 300);
+        }
       }
     }, 5000);
   } else {
@@ -51,6 +87,14 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(function () {
       document.body.classList.add("loaded");
       showVisionWithAnimation();
+      
+      // On mobile, animate work images
+      if (isMobile) {
+        console.log("Mobile detected - triggering immediate animation (no video)");
+        setTimeout(() => {
+          animateWorkImages();
+        }, 300);
+      }
     }, 2000);
   }
 
@@ -114,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
     
     // Get position of vision container
-    const visionRect = visionContainer.getBoundingClientRect();
+    const visionRect = visionContainer ? visionContainer.getBoundingClientRect() : {top: 0};
     const visionPosition = scrollPosition + visionRect.top;
     
     // Apply fixed position to body to prevent scrolling
@@ -222,7 +266,7 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener('keydown', function(e) {
     if (!isScrollLocked || !scrollingEnabled) return;
     
-    if (e.key === 'ArrowDown' || e.key === 'Space') {
+    if (e.key === 'ArrowDown' || e.key === ' ') {
       showNextVisionSlide();
       e.preventDefault();
     } else if (e.key === 'ArrowUp' && currentVisionSlide > 0) {
@@ -238,8 +282,81 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // High-performance animation function for work images (keeping original functionality)
+  // Variable to track whether the our-work section has been observed
+  let ourWorkObserved = false;
+
+  // Set up IntersectionObserver for "our-work" section
+  if (ourWorkSection && !isMobile) {
+    const workSectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        // If the section is entering the viewport and on desktop
+        if (entry.isIntersecting) {
+          console.log("Our work section is visible - triggering animation");
+          animateWorkImages();
+          ourWorkObserved = true; // Mark as observed
+        } else if (!entry.isIntersecting && ourWorkObserved) {
+          // Reset animation state when section goes out of view
+          // This allows re-animation when scrolling back to the section
+          console.log("Our work section exited viewport - resetting animation state");
+          resetWorkImagesAnimation();
+          ourWorkObserved = false; // Reset observed state
+        }
+      });
+    }, {
+      threshold: 0.2, // Trigger when 20% of the section is visible
+      rootMargin: '0px'
+    });
+    
+    // Start observing the work section
+    workSectionObserver.observe(ourWorkSection);
+    console.log("IntersectionObserver set up for our-work section");
+  } else if (isMobile) {
+    // For mobile, we'll handle the animation differently
+    console.log("Mobile device detected - skipping IntersectionObserver setup");
+    
+    // For mobile, schedule immediate animation after a short delay
+    setTimeout(() => {
+      console.log("Running immediate animation for mobile");
+      animateWorkImages();
+    }, 500); // Small delay to ensure DOM is ready
+  }
+
+  // Function to reset work images animation state
+  function resetWorkImagesAnimation() {
+    if (isMobile) return; // Don't reset on mobile
+    
+    workImagesAnimated = false;
+    
+    // Reset animation classes on all images
+    const elements = {
+      first: document.querySelector('.first-img'),
+      second: document.querySelector('.second-img'),
+      third: document.querySelector('.third-img'),
+      fourth: document.querySelector('.img-right-side')
+    };
+    
+    // Reset all animation classes
+    Object.values(elements).forEach(element => {
+      if (element) {
+        element.classList.remove('custom-flip-left', 'custom-flip-right', 'custom-flip-up', 'custom-flip-down');
+        element.style.opacity = '0';
+      }
+    });
+    
+    console.log("Work images animation reset for re-animation");
+  }
+
+  // Improved work images animation function that works on all devices
   function animateWorkImages() {
+    // For desktop, only animate if section is visible and not already animated
+    if (!isMobile && workImagesAnimated) {
+      console.log("Work images already animated, skipping");
+      return;
+    }
+    
+    console.log("Animating work images", isMobile ? "on mobile" : "on desktop");
+    workImagesAnimated = true; // Mark as animated
+    
     // Pre-cache DOM elements for better performance
     const elements = {
       first: document.querySelector('.first-img'),
@@ -248,77 +365,136 @@ document.addEventListener("DOMContentLoaded", function () {
       fourth: document.querySelector('.img-right-side')
     };
     
-    // Animation sequence with optimal timing
+    // Define animations with mobile-friendly timing
     const animations = [
       { element: elements.first, type: 'custom-flip-left', delay: 0 },
-      { element: elements.second, type: 'custom-flip-right', delay: 50 }, 
-      { element: elements.third, type: 'custom-flip-up', delay: 100 }, 
-      { element: elements.fourth, type: 'custom-flip-down', delay: 150 }
+      { element: elements.second, type: 'custom-flip-right', delay: isMobile ? 300 : 50 },
+      { element: elements.third, type: 'custom-flip-up', delay: isMobile ? 600 : 100 },
+      { element: elements.fourth, type: 'custom-flip-down', delay: isMobile ? 900 : 150 }
     ];
     
-    // Reset all animations first (in a single frame)
-    requestAnimationFrame(() => {
-      animations.forEach(item => {
-        if (item.element) {
-          // Remove animation classes
-          item.element.classList.remove(item.type);
-          // Ensure element is visible in the DOM but not yet animated
-          item.element.style.opacity = '0';
-        }
-      });
-      
-      // Force reflow once for all elements
-      void document.body.offsetHeight;
-      
-      // Apply animations with precise timing
-      animations.forEach(item => {
-        if (item.element) {
-          setTimeout(() => {
-            requestAnimationFrame(() => {
-              item.element.classList.add(item.type);
-            });
-          }, item.delay);
-        }
-      });
+    // Ensure all work images are visible before animation
+    document.querySelectorAll('.work-img, .third-img').forEach(img => {
+      img.style.visibility = 'visible';
+    });
+    
+    // Apply animations with precise timing
+    animations.forEach(item => {
+      if (item.element) {
+        console.log(`Animating ${item.element.className} with ${item.type}`);
+        
+        // First remove any existing animation classes
+        item.element.classList.remove('flip-left', 'flip-right', 'flip-up', 'flip-down');
+        item.element.classList.remove('custom-flip-left', 'custom-flip-right', 'custom-flip-up', 'custom-flip-down');
+        
+        // Force reflow
+        void item.element.offsetWidth;
+        
+        // Schedule animation
+        setTimeout(() => {
+          item.element.classList.add(item.type);
+          item.element.style.opacity = '1';
+        }, item.delay);
+      }
     });
   }
 
-  // Variables to track animation state
-  let animationsAlreadyPlayed = false;
-  let isOutsideViewport = false;
-  
-  // Optimized scroll detection for desktop devices
-  if (window.innerWidth > 768) {
-    // Use Intersection Observer instead of scroll events for better performance
-    const animationObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        // When section enters viewport
-        if (entry.isIntersecting && isOutsideViewport) {
-          // Schedule animation in next frame for smoothness
-          requestAnimationFrame(() => {
-            animateWorkImages();
-          });
-          isOutsideViewport = false;
-        } 
-        // When section leaves viewport
-        else if (!entry.isIntersecting && !isOutsideViewport) {
-          isOutsideViewport = true;
+  // Add CSS for custom animations if not already present
+  function addCustomAnimationStyles() {
+    if (!document.getElementById('custom-animation-styles')) {
+      const styleSheet = document.createElement('style');
+      styleSheet.id = 'custom-animation-styles';
+      styleSheet.textContent = `
+        .custom-flip-left, .custom-flip-right, .custom-flip-up, .custom-flip-down {
+          animation-duration: 0.8s;
+          animation-fill-mode: both;
+          opacity: 0;
         }
-      });
-    }, {
-      // Slightly trigger before fully visible for smoother perception
-      threshold: 0.15,
-      rootMargin: '0px'
-    });
-    
-    // Start observing the work section
-    if (ourWorkSection) {
-      animationObserver.observe(ourWorkSection);
+        
+        .custom-flip-left {
+          animation-name: customFlipLeft;
+        }
+        
+        .custom-flip-right {
+          animation-name: customFlipRight;
+        }
+        
+        .custom-flip-up {
+          animation-name: customFlipUp;
+        }
+        
+        .custom-flip-down {
+          animation-name: customFlipDown;
+        }
+        
+        @keyframes customFlipLeft {
+          from {
+            transform: perspective(400px) rotate3d(0, 1, 0, 90deg);
+            opacity: 0;
+          }
+          to {
+            transform: perspective(400px) rotate3d(0, 1, 0, 0deg);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes customFlipRight {
+          from {
+            transform: perspective(400px) rotate3d(0, 1, 0, -90deg);
+            opacity: 0;
+          }
+          to {
+            transform: perspective(400px) rotate3d(0, 1, 0, 0deg);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes customFlipUp {
+          from {
+            transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+            opacity: 0;
+          }
+          to {
+            transform: perspective(400px) rotate3d(1, 0, 0, 0deg);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes customFlipDown {
+          from {
+            transform: perspective(400px) rotate3d(1, 0, 0, -90deg);
+            opacity: 0;
+          }
+          to {
+            transform: perspective(400px) rotate3d(1, 0, 0, 0deg);
+            opacity: 1;
+          }
+        }
+        
+        /* Make sure all work images are initially invisible */
+        .work-img, .third-img {
+          opacity: 0;
+          visibility: visible;
+          will-change: transform, opacity;
+        }
+      `;
+      document.head.appendChild(styleSheet);
     }
   }
+  
+  // Add custom animation styles
+  addCustomAnimationStyles();
 
   // Add visual indicator for scroll lock (optional)
   function createScrollIndicator() {
+    if (!visionContainer) return;
+    
+    // Remove existing indicator if any
+    const existingIndicator = document.querySelector('.scroll-indicator');
+    if (existingIndicator) {
+      existingIndicator.remove();
+    }
+    
     const indicator = document.createElement('div');
     indicator.className = 'scroll-indicator';
     indicator.innerHTML = `
@@ -327,14 +503,10 @@ document.addEventListener("DOMContentLoaded", function () {
           `<span class="indicator-dot ${i === 0 ? 'active' : ''}"></span>`
         ).join('')}
       </div>
-      <div class="indicator-arrow">
-        <svg width="20" height="12" viewBox="0 0 20 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M10 12L0 2L2 0L10 8L18 0L20 2L10 12Z" fill="#7a0034"/>
-        </svg>
-      </div>
+      
     `;
     
-    document.querySelector('.vision-container').appendChild(indicator);
+    visionContainer.appendChild(indicator);
     
     // Update indicator when slides change
     const updateIndicator = () => {
@@ -345,7 +517,9 @@ document.addEventListener("DOMContentLoaded", function () {
       
       // Hide arrow on last slide
       const arrow = indicator.querySelector('.indicator-arrow');
-      arrow.style.opacity = currentVisionSlide >= visionSlides.length - 1 ? '0' : '1';
+      if (arrow) {
+        arrow.style.opacity = currentVisionSlide >= visionSlides.length - 1 ? '0' : '1';
+      }
     };
     
     // Add observer to watch for slide changes
@@ -358,8 +532,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
   
-  // Create scroll indicator
-  createScrollIndicator();
+  // Create scroll indicator if vision container exists
+  if (visionContainer) {
+    createScrollIndicator();
+  }
 
   // Theme toggle functionality (keeping original functionality)
   const themeToggle = document.getElementById("themeToggle");
@@ -428,5 +604,5 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  console.log("Script setup complete with scroll lock");
+  console.log("Script setup complete with scroll-triggered animations for desktop and immediate animations for mobile");
 });
